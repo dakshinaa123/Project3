@@ -1,0 +1,226 @@
+import tkinter
+import tkinter.messagebox
+from tkinter import  *
+import mysql.connector
+import random as rd
+
+mydb = mysql.connector.connect(
+host="localhost",
+user="root",
+passwd="",
+database = "product"
+)
+
+mycursor = mydb.cursor()
+#Create Table
+#mycursor.execute("CREATE TABLE if not exists reg (Name VARCHAR(25), Email VARCHAR(25), Mobile int(10), Password VARCHAR(25))")
+#  Message for registration
+def entry():
+    global e2,e3,e4,e5
+    global w2
+    w2.destroy()
+    p1=e2.get()
+    p2=e3.get()
+    p3=e4.get()
+    p4=e5.get()
+    val=(p1,p2,p3,p4)
+     
+    query="INSERT INTO product VALUES (%s, %s,%s, %s)"
+    
+    mycursor.execute(query,val)     
+    mydb.commit()
+    tkinter.messagebox.showinfo("DONE", "Your Product Details Added...")
+
+def entry1():
+    global ed1
+    pd1=[ed1.get()]
+    if (pd1 != ""):
+        query="DELETE FROM product where Pid = %s"
+        mycursor.execute(query,pd1)
+        mydb.commit()
+        tkinter.messagebox.showinfo("DONE", "Your product Deleted...")
+    else:
+        tkinter.messagebox.showinfo("Not Deleted", "Fill Details...")
+    
+def entry2():
+    global ue2,ue3,ue4,ue5
+    if (ue2.get() != "" and ue3.get() != "" and ue4.get() != ""and ue5.get() != ""):   
+        p1=ue2.get()
+        p2=ue3.get()
+        p3=ue4.get()
+        p4=ue5.get()
+        val = [p2, p3, p4, p1]
+         
+        query="UPDATE product SET PName = %s, PPrice = %s, Description = %s where Pid = %s"    
+        mycursor.execute(query,val)     
+        mydb.commit()
+        tkinter.messagebox.showinfo("DONE", "Your Product Details Updated...")
+    else:
+        tkinter.messagebox.showinfo("Not Updated", "Fill Details...")
+def deletepro():        
+    w6=Tk()
+    global ed1, b2
+    w6.geometry("600x400")
+    w6.configure(bg="aqua")
+    label=tkinter.Label(w6,text="Delete Products",font=("Monotype Corsiva",25), bg="aqua")
+    label.place(x=250,y=2)
+    d1=tkinter.Label(w6,text="Enter Product Id",bg="aqua",font=("Monotype Corsiva",14))
+    d1.place(x=70,y=75)
+    ed1=tkinter.Entry(w6,width=40)
+    ed1.place(x=280,y=82)
+    b2=tkinter.Button(w6,text="Delete", font=("Monotype Corsiva",14),fg="Blue", command=entry1)
+    b2.place(x=250,y=150)     
+    
+    w6.mainloop()
+  
+def updatepro():
+    global ue2,ue3,ue4,ue5
+    global w2
+    w2.destroy()
+    
+    w7=Tk()
+    w7.geometry("600x400")
+    w7.configure(bg="aqua")
+    label=tkinter.Label(w7,text="Update Products",font=("Monotype Corsiva",25), bg="aqua")
+    label.pack(pady= 30)
+    ul2=tkinter.Label(w7,text="Product Id",bg="aqua",font=("Monotype Corsiva",14))
+    ul2.place(x=70,y=75)
+    ue2=tkinter.Entry(w7,width=40)
+    ue2.place(x=180,y=82)
+    ul3=tkinter.Label(w7,text="Product Name",bg="aqua",font=("Monotype Corsiva",14))
+    ul3.place(x=70,y=118)
+    ue3=tkinter.Entry(w7,width=40)
+    ue3.place(x=180,y=122)
+    ul4=tkinter.Label(w7,text="Product Price",bg="aqua",font=("Monotype Corsiva",14))
+    ul4.place(x=70,y=157)
+    ue4=tkinter.Entry(w7,width=40)
+    ue4.place(x=180,y=162)
+    ul5=tkinter.Label(w7,text="Description",bg="aqua",font=("Monotype Corsiva",14))
+    ul5.place(x=70,y=200)
+    ue5=tkinter.Entry((w7),width=40)
+    ue5.place(x=180,y=202)
+    
+    ub1=tkinter.Button(w7,text="Update", font=("Monotype Corsiva",14),fg="Blue", command=entry2)
+    ub1.place(x=250,y=250)   
+    
+    w7.resizable(False,False)
+    w7.mainloop()
+
+    
+def viewpro():
+    global w2
+    
+    w4=Tk()
+    w4.geometry("600x400")
+    w4.configure(bg="aqua")
+    label=tkinter.Label(w4,text="Display Products",font=("Monotype Corsiva",25), bg="aqua")
+    label.place(x=180,y=2)
+    
+    mycursor.execute('select Pid, PName, PPrice, Description from Product')
+    pro=mycursor.fetchall()
+    print(pro)   
+    e = Label(w4,width=15, relief='flat', anchor="w", bg = "aqua", fg="aqua") 
+    e.grid(row=1, column=0,sticky = W, pady = 25)
+   
+    e = Label(w4,width=20, text="Product Id", borderwidth=2,relief='ridge', anchor="w", bg="Blue") 
+    e.grid(row=5, column=0)    
+    e = Label(w4,width=20, text="Product Name", borderwidth=2,relief='ridge', anchor="w", bg="Blue") 
+    e.grid(row=5, column=1)
+    e = Label(w4,width=20, text="Product Price", borderwidth=2,relief='ridge', anchor="w", bg="Blue") 
+    e.grid(row=5, column=2)
+    e = Label(w4,width=20 , text="Description", borderwidth=2,relief='ridge', anchor="w", bg="Blue") 
+    e.grid(row=5, column=3)
+    
+    i=6
+    for student in pro:
+        for j in range(len(student)):
+            e = Label(w4,width=20, text=student[j], borderwidth=2,relief='ridge', anchor="w", bg="aqua") 
+            e.grid(row=i, column=j) 
+            #e.insert(END, student[j])
+        i=i+1
+   
+    w2.destroy()
+   
+
+def addpro():
+    global e2,e3,e4,e5
+    w3=tkinter.Tk()
+    w3.configure(bg="aqua")
+    w3.geometry("600x400")
+    label=tkinter.Label(w3,text="Add Product",bg="aqua",font=("Monotype Corsiva",25))
+    label.pack()
+    
+    
+    l2=tkinter.Label(w3,text="Product Id",bg="aqua",font=("Monotype Corsiva",14))
+    l2.place(x=70,y=75)
+    e2=tkinter.Entry(w3,width=40)
+    e2.place(x=180,y=82)
+    l3=tkinter.Label(w3,text="Product Name",bg="aqua",font=("Monotype Corsiva",14))
+    l3.place(x=70,y=118)
+    e3=tkinter.Entry(w3,width=40)
+    e3.place(x=180,y=122)
+    l4=tkinter.Label(w3,text="Product Price",bg="aqua",font=("Monotype Corsiva",14))
+    l4.place(x=70,y=157)
+    e4=tkinter.Entry(w3,width=40)
+    e4.place(x=180,y=162)
+    l5=tkinter.Label(w3,text="Description",bg="aqua",font=("Monotype Corsiva",14))
+    l5.place(x=70,y=200)
+    e5=tkinter.Entry((w3),width=40)
+    e5.place(x=180,y=202)
+    
+    b1=tkinter.Button(w3,text="Submit", font=("Monotype Corsiva",14),fg="Blue", command=entry)
+    b1.place(x=250,y=250)   
+    
+    w3.resizable(False,False)
+    w3.mainloop()
+
+def check():
+    if E1.get()=="1" and E2.get()=="1":
+        global w2
+        w2=tkinter.Tk()
+        w2.geometry("600x400")
+        w2.configure(bg="aqua")
+        L4=Label(w2, text="Product Management System", bg="aqua", font=("Monotype Corsiva",25))
+        L4.pack(pady= 30)
+        w2.title("Main Menu")
+        
+        B2=tkinter.Button(w2,text="Add Product",font=("Monotype Corsiva",14),bg="aqua",fg="navy",command=addpro)
+        B2.place(x=150,y=150)
+        B3=tkinter.Button(w2,text="View Product",font=("Monotype Corsiva",14),bg="aqua",fg="navy",command=viewpro)
+        B3.place(x=300,y=150)
+        B4=tkinter.Button(w2,text="Update Product",font=("Monotype Corsiva",14),bg="aqua",fg="navy",command=updatepro)
+        B4.place(x=300,y=200)
+        B5=tkinter.Button(w2,text="Delete Product",font=("Monotype Corsiva",14),bg="aqua",fg="navy",command=deletepro)
+        B5.place(x=150,y=200)
+        win.destroy()
+        
+    else:
+        L3=tkinter.Label(win,text="Invalid Crudentials...",font=("Monotype Corsiva",14),bg="aqua")
+        L3.place(x=230,y=250)
+        
+win=tkinter.Tk()
+win.geometry("600x400")
+win.configure(bg="aqua")
+win.title("Login Window")
+
+L1=tkinter.Label(win,text="Log-in Page",bg="aqua", font=("Monotype Corsiva",25))
+L1.pack(pady= 20)
+
+L2=tkinter.Label(win,text="Enter UserID: ",bg="aqua",font=("Monotype Corsiva",14))
+L2.place(x=70,y=75)
+
+E1=tkinter.Entry(win,width=25,font=(14))
+E1.place(x=250,y=75)
+
+
+L3=tkinter.Label(win,text="Enter Password: ",bg="aqua",font=("Monotype Corsiva",14))
+L3.place(x=70,y=130)
+
+E2=tkinter.Entry(win,width=25,font=(14),show="*")
+E2.place(x=250,y=130)
+
+
+B1=tkinter.Button(win,text="Submit",font=("Monotype Corsiva",14),fg="Blue",command=check)
+B1.pack(pady=100)
+
+win.mainloop()
